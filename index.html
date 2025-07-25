@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Ясень AI - Ваш надежный ассистент</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+			min-height: 100vh;
+			background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #f0fdf4 100%);
+			display: flex;
+			flex-direction: column;
+		}
+
+		.header {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 2rem 0 1.5rem;
+		}
+
+		.logo-container {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.logo {
+			width: 3rem;
+			height: 3rem;
+			background: linear-gradient(135deg, #22c55e, #16a34a);
+			border-radius: 0.75rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+		}
+
+		.logo svg {
+			width: 1.75rem;
+			height: 1.75rem;
+			color: white;
+		}
+
+		.title {
+			font-size: 2.5rem;
+			font-weight: 700;
+			background: linear-gradient(135deg, #15803d, #166534);
+			-webkit-background-clip: text;
+			background-clip: text;
+			-webkit-text-fill-color: transparent;
+			color: transparent;
+		}
+
+		.subtitle {
+			color: rgba(22, 163, 74, 0.7);
+			font-size: 0.875rem;
+		}
+
+		.chat-container {
+			flex: 1;
+			max-width: 64rem;
+			margin: 0 auto;
+			width: 100%;
+			padding: 0 1rem 1.5rem;
+		}
+
+		.chat-card {
+			height: 600px;
+			background: rgba(255, 255, 255, 0.8);
+			backdrop-filter: blur(12px);
+			border: 1px solid rgba(34, 197, 94, 0.2);
+			box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+			border-radius: 1rem;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.messages-area {
+			flex: 1;
+			padding: 1.5rem;
+			overflow-y: auto;
+			scrollbar-width: thin;
+			scrollbar-color: rgba(34, 197, 94, 0.3) transparent;
+		}
+
+		.messages-area::-webkit-scrollbar {
+			width: 6px;
+		}
+
+		.messages-area::-webkit-scrollbar-track {
+			background: transparent;
+		}
+
+		.messages-area::-webkit-scrollbar-thumb {
+			background: rgba(34, 197, 94, 0.3);
+			border-radius: 3px;
+		}
+
+		.welcome-message {
+			text-align: center;
+			padding: 3rem 0;
+		}
+
+		.welcome-icon {
+			width: 4rem;
+			height: 4rem;
+			background: #dcfce7;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin: 0 auto 1rem;
+		}
+
+		.welcome-icon svg {
+			width: 2rem;
+			height: 2rem;
+			color: #16a34a;
+		}
+
+		.welcome-title {
+			font-weight: 600;
+			color: #166534;
+			margin-bottom: 0.5rem;
+		}
+
+		.welcome-text {
+			color: rgba(22, 163, 74, 0.7);
+			font-size: 0.875rem;
+			max-width: 24rem;
+			margin: 0 auto;
+		}
+
+		.message {
+			display: flex;
+			gap: 0.75rem;
+			margin-bottom: 1rem;
+		}
+
+		.message.user {
+			flex-direction: row-reverse;
+		}
+
+		.message-avatar {
+			width: 2rem;
+			height: 2rem;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+		}
+
+		.message-avatar.user {
+			background: #16a34a;
+			color: white;
+		}
+
+		.message-avatar.bot {
+			background: #dcfce7;
+			color: #16a34a;
+		}
+
+		.message-avatar svg {
+			width: 1rem;
+			height: 1rem;
+		}
+
+		.message-content {
+			max-width: 70%;
+			border-radius: 1rem;
+			padding: 0.75rem 1rem;
+			font-size: 0.875rem;
+			line-height: 1.5;
+		}
+
+		.message-content.user {
+			background: #16a34a;
+			color: white;
+		}
+
+		.message-content.bot {
+			background: #f0fdf4;
+			color: #14532d;
+			border: 1px solid #dcfce7;
+		}
+
+		.typing-indicator {
+			display: flex;
+			gap: 0.25rem;
+		}
+
+		.typing-dot {
+			width: 0.5rem;
+			height: 0.5rem;
+			background: #22c55e;
+			border-radius: 50%;
+			animation: typing 1.4s infinite ease-in-out;
+		}
+
+		.typing-dot:nth-child(2) {
+			animation-delay: 0.2s;
+		}
+
+		.typing-dot:nth-child(3) {
+			animation-delay: 0.4s;
+		}
+
+		@keyframes typing {
+
+			0%,
+			80%,
+			100% {
+				transform: scale(0.8);
+				opacity: 0.5;
+			}
+
+			40% {
+				transform: scale(1);
+				opacity: 1;
+			}
+		}
+
+		.input-area {
+			padding: 1.5rem;
+			border-top: 1px solid rgba(34, 197, 94, 0.1);
+		}
+
+		.input-container {
+			display: flex;
+			gap: 0.75rem;
+		}
+
+		.input-field {
+			flex: 1;
+			padding: 0.75rem 1rem;
+			border: 1px solid #bbf7d0;
+			border-radius: 0.75rem;
+			font-size: 0.875rem;
+			outline: none;
+			transition: all 0.2s;
+		}
+
+		.input-field:focus {
+			border-color: #22c55e;
+			box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+		}
+
+		.input-field:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		.send-button {
+			padding: 0.75rem 1.5rem;
+			background: #16a34a;
+			color: white;
+			border: none;
+			border-radius: 0.75rem;
+			font-size: 0.875rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+		}
+
+		.send-button:hover:not(:disabled) {
+			background: #15803d;
+			box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+			transform: translateY(-1px);
+		}
+
+		.send-button:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+			transform: none;
+		}
+
+		.send-button svg {
+			width: 1rem;
+			height: 1rem;
+		}
+
+		.footer {
+			text-align: center;
+			padding: 1rem;
+		}
+
+		.footer-text {
+			color: rgba(22, 163, 74, 0.5);
+			font-size: 0.75rem;
+		}
+
+		@media (max-width: 640px) {
+			.title {
+				font-size: 2rem;
+			}
+
+			.chat-card {
+				height: 500px;
+			}
+
+			.messages-area {
+				padding: 1rem;
+			}
+
+			.input-area {
+				padding: 1rem;
+			}
+
+			.send-button span {
+				display: none;
+			}
+		}
+
+		.hidden {
+			display: none;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="header">
+		<div class="logo-container">
+			<div class="logo">
+				<svg height="200px" width="200px" version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg"
+					xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve"
+					fill="#000000">
+					<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+					<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+					<g id="SVGRepo_iconCarrier">
+						<style type="text/css">
+							.st0 {
+								fill: #000000;
+							}
+						</style>
+						<g>
+							<path class="st0"
+								d="M465.771,234.587c0-26.914-10.749-51.289-28.142-69.166c0.629-4.688,1.075-9.437,1.075-14.301 c0-54.151-40.625-98.726-93.05-105.14C319.308,17.754,281.874,0,240.206,0C160.476,0,95.853,64.624,95.853,144.361 c0,0.422,0.062,0.821,0.062,1.236c-29.975,20.27-49.686,54.58-49.686,93.494c0,53.346,37.08,97.937,86.842,109.667 c10.089,24.69,34.318,42.106,62.636,42.106c10.557,0,20.508-2.486,29.407-6.798V512h77.528v-83.988l30.236-51.657 c30.95-2.256,57.097-21.766,68.743-49.033C439.087,313.128,465.771,277.022,465.771,234.587z M260.615,342.229 c0.66,0.928,1.343,1.826,2.041,2.724l-3.43,1.396C259.725,344.984,260.208,343.625,260.615,342.229z M284.874,405.402v-40.579 c7.181,4.366,15.076,7.642,23.492,9.622L284.874,405.402z">
+							</path>
+						</g>
+					</g>
+				</svg>
+			</div>
+			<h1 class="title">Ясень AI</h1>
+		</div>
+		<p class="subtitle">Ваш надежный ассистент по важным вопросам</p>
+	</div>
+
+	<div class="chat-container">
+		<div class="chat-card">
+			<div class="messages-area" id="messagesArea">
+				<div class="welcome-message" id="welcomeMessage">
+					<div class="welcome-icon">
+						<svg height="200px" width="200px" version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg"
+							xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" fill="#000000">
+							<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+							<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+							<g id="SVGRepo_iconCarrier">
+								<style type="text/css">
+									.st0 {
+										fill: #000000;
+									}
+								</style>
+								<g>
+									<path class="st0"
+										d="M465.771,234.587c0-26.914-10.749-51.289-28.142-69.166c0.629-4.688,1.075-9.437,1.075-14.301 c0-54.151-40.625-98.726-93.05-105.14C319.308,17.754,281.874,0,240.206,0C160.476,0,95.853,64.624,95.853,144.361 c0,0.422,0.062,0.821,0.062,1.236c-29.975,20.27-49.686,54.58-49.686,93.494c0,53.346,37.08,97.937,86.842,109.667 c10.089,24.69,34.318,42.106,62.636,42.106c10.557,0,20.508-2.486,29.407-6.798V512h77.528v-83.988l30.236-51.657 c30.95-2.256,57.097-21.766,68.743-49.033C439.087,313.128,465.771,277.022,465.771,234.587z M260.615,342.229 c0.66,0.928,1.343,1.826,2.041,2.724l-3.43,1.396C259.725,344.984,260.208,343.625,260.615,342.229z M284.874,405.402v-40.579 c7.181,4.366,15.076,7.642,23.492,9.622L284.874,405.402z">
+									</path>
+								</g>
+							</g>
+						</svg>
+					</div>
+					<h3 class="welcome-title">Добро пожаловать в Ясень AI!</h3>
+					<p class="welcome-text">
+						Задайте мне любой вопрос.
+					</p>
+				</div>
+			</div>
+
+			<div class="input-area">
+				<div class="input-container">
+					<input
+                        type="text"
+                        class="input-field"
+                        id="messageInput"
+                        placeholder="Напишите ваш вопрос..."
+                        maxlength="500"
+                    >
+					<button class="send-button" id="sendButton">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                        <span>Спросить</span>
+                    </button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="footer">
+		<p class="footer-text">
+			© 2025 Ясень AI. Специализируемся исключительно на вопросах местонахождения.
+		</p>
+	</div>
+
+	<script>
+		class YasenAI {
+            constructor() {
+                this.messages = [];
+                this.isTyping = false;
+                this.messageIdCounter = 0;
+                
+                this.messagesArea = document.getElementById('messagesArea');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.welcomeMessage = document.getElementById('welcomeMessage');
+                
+                this.init();
+            }
+            
+            init() {
+                this.sendButton.addEventListener('click', () => this.handleSendMessage());
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.handleSendMessage();
+                    }
+                });
+                
+                this.messageInput.addEventListener('input', () => {
+                    this.updateSendButton();
+                });
+            }
+            
+            updateSendButton() {
+                const hasText = this.messageInput.value.trim().length > 0;
+                this.sendButton.disabled = !hasText || this.isTyping;
+            }
+            
+            getBotResponse(userMessage) {
+                const lowerMessage = userMessage.toLowerCase();
+                
+                if (lowerMessage.includes('где моя любимая')) {
+                    return 'Я не могу точно ответить на данный вопрос. Советую обратиться к сервису Тополь AI.';
+                }
+                
+                return 'Я принимаю только вопросы о том, где твоя любимая.';
+            }
+            
+            async handleSendMessage() {
+                const text = this.messageInput.value.trim();
+                if (!text || this.isTyping) return;
+                
+                // Скрываем приветственное сообщение
+                if (this.welcomeMessage) {
+                    this.welcomeMessage.style.display = 'none';
+                }
+                
+                // Добавляем сообщение пользователя
+                this.addMessage(text, true);
+                this.messageInput.value = '';
+                this.updateSendButton();
+                
+                // Показываем индикатор печати
+                this.showTypingIndicator();
+                
+                // Генерируем ответ с задержкой
+                const delay = 1000 + Math.random() * 1000;
+                setTimeout(() => {
+                    this.hideTypingIndicator();
+                    const botResponse = this.getBotResponse(text);
+                    this.addMessage(botResponse, false);
+                }, delay);
+            }
+            
+            addMessage(text, isUser) {
+                const messageId = ++this.messageIdCounter;
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+                messageDiv.setAttribute('data-message-id', messageId);
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = `message-avatar ${isUser ? 'user' : 'bot'}`;
+                
+                const avatarIcon = document.createElement('svg');
+                avatarIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                avatarIcon.setAttribute('fill', 'none');
+                avatarIcon.setAttribute('viewBox', '0 0 24 24');
+                avatarIcon.setAttribute('stroke', 'currentColor');
+                
+                if (isUser) {
+                    avatarIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />';
+                } else {
+                    avatarIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C8.686 2 6 4.686 6 8c0 2.5 1.5 4.5 3 6l3 6 3-6c1.5-1.5 3-3.5 3-6 0-3.314-2.686-6-6-6z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 10c-.5.5-1 1-1 2 0 .5.2 1 .5 1.5M16 10c.5.5 1 1 1 2 0 .5-.2 1-.5 1.5"/>';
+                }
+                
+                avatarDiv.appendChild(avatarIcon);
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = `message-content ${isUser ? 'user' : 'bot'}`;
+                contentDiv.textContent = text;
+                
+                messageDiv.appendChild(avatarDiv);
+                messageDiv.appendChild(contentDiv);
+                
+                this.messagesArea.appendChild(messageDiv);
+                this.scrollToBottom();
+                
+                // Добавляем в массив сообщений
+                this.messages.push({
+                    id: messageId,
+                    text: text,
+                    isUser: isUser,
+                    timestamp: new Date()
+                });
+            }
+            
+            showTypingIndicator() {
+                this.isTyping = true;
+                this.updateSendButton();
+                this.messageInput.disabled = true;
+                
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message bot';
+                typingDiv.id = 'typingIndicator';
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'message-avatar bot';
+                
+                const avatarIcon = document.createElement('svg');
+                avatarIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                avatarIcon.setAttribute('fill', 'none');
+                avatarIcon.setAttribute('viewBox', '0 0 24 24');
+                avatarIcon.setAttribute('stroke', 'currentColor');
+                avatarIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C8.686 2 6 4.686 6 8c0 2.5 1.5 4.5 3 6l3 6 3-6c1.5-1.5 3-3.5 3-6 0-3.314-2.686-6-6-6z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 10c-.5.5-1 1-1 2 0 .5.2 1 .5 1.5M16 10c.5.5 1 1 1 2 0 .5-.2 1-.5 1.5"/>';
+                
+                avatarDiv.appendChild(avatarIcon);
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content bot';
+                
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'typing-indicator';
+                
+                for (let i = 0; i < 3; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'typing-dot';
+                    typingIndicator.appendChild(dot);
+                }
+                
+                contentDiv.appendChild(typingIndicator);
+                typingDiv.appendChild(avatarDiv);
+                typingDiv.appendChild(contentDiv);
+                
+                this.messagesArea.appendChild(typingDiv);
+                this.scrollToBottom();
+            }
+            
+            hideTypingIndicator() {
+                this.isTyping = false;
+                this.updateSendButton();
+                this.messageInput.disabled = false;
+                this.messageInput.focus();
+                
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+            
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.messagesArea.scrollTop = this.messagesArea.scrollHeight;
+                }, 10);
+            }
+        }
+        
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', () => {
+            new YasenAI();
+        });
+	</script>
+</body>
+
+</html>
