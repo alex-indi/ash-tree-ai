@@ -453,7 +453,7 @@
             getBotResponse(userMessage) {
                 const lowerMessage = userMessage.toLowerCase();
                 
-                if (lowerMessage.includes('где моя любимая')) {
+                if (lowerMessage.includes('где моя любимая')) or (lowerMessage.includes('где мой любимый')){
                     return 'Я не могу точно ответить на данный вопрос. Советую обратиться к сервису Тополь AI.';
                 }
                 
